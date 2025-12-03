@@ -10,7 +10,7 @@ import questionRoutes from "./routes/question.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import devRoutes from "./routes/dev.routes.js";
 console.log(process.env.MONGODB_URL);
-const rawFrontend = "https://proctortamdev.netlify.app/";
+const rawFrontend = process.env.FRONTEND_URL || "";
 const FRONTEND_URL = rawFrontend.replace(/\/+$/, "");
 console.log("Configured FRONTEND_URL:", FRONTEND_URL);
 const allowedOrigins = [
@@ -18,6 +18,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
 ].filter(Boolean);
+console.log("Allowed CORS origins:", allowedOrigins);
 
 const app = express();
 app.use(
@@ -33,8 +34,8 @@ app.use(
     credentials: true,
   })
 );
-// Also ensure preflight requests are handled
-app.options("*", cors());
+// Also ensure preflight requests are handled (use regex to avoid path-to-regexp '*' parsing issues)
+app.options(/.*/, cors());
 app.use(express.json());
 
 // app.use(cors(corsOptions));
