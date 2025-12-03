@@ -10,7 +10,7 @@ import questionRoutes from "./routes/question.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import devRoutes from "./routes/dev.routes.js";
 console.log(process.env.MONGODB_URL);
-const FRONTEND_URL = "http://localhost:5173";
+const FRONTEND_URL = "https://proctortamdev.netlify.app/";
 
 const app = express();
 app.use(
