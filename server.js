@@ -9,14 +9,13 @@ import proctorRoutes from "./routes/proctor.routes.js";
 import questionRoutes from "./routes/question.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import devRoutes from "./routes/dev.routes.js";
- console.log(process.env.MONGODB_URL);
- 
-
+console.log(process.env.MONGODB_URL);
+const FRONTEND_URL = "http://localhost:5173";
 
 const app = express();
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: FRONTEND_URL,
     credentials: true,
   })
 );
@@ -39,5 +38,7 @@ const port = process.env.PORT || 8080;
 
 app.listen(port, async () => {
   await dbConfig();
-  console.log(`Server started at http://localhost:${port} and https://testproctor.onrender.com`);
+  console.log(
+    `Server started at http://localhost:${port} and https://testproctor.onrender.com`
+  );
 });
