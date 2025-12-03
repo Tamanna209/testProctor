@@ -9,7 +9,8 @@ import proctorRoutes from "./routes/proctor.routes.js";
 import questionRoutes from "./routes/question.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import devRoutes from "./routes/dev.routes.js";
-
+ console.log(process.env.MONGODB_URL);
+ 
 
 
 const app = express();
