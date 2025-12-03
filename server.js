@@ -39,5 +39,5 @@ const port = process.env.PORT || 8080;
 
 app.listen(port, async () => {
   await dbConfig();
-  console.log(`Server started at http://localhost:${port}`);
+  console.log(`Server started at http://localhost:${port} and https://testproctor.onrender.com`);
 });

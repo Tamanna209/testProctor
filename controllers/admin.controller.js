@@ -4,7 +4,7 @@ import User from "../models/users.model.js";
 import AptitudeQuestion from "../models/aptitudeQuestions.model.js";
 import ADMIN_KEY from "./adminKey.js";
 const ADMIN_PASSKEY = ADMIN_KEY;
-console.log("key",ADMIN_PASSKEY);
+// console.log("key",ADMIN_PASSKEY);
 
 // Verify admin passkey
 const verifyAdminPasskey = async (req, res) => {
