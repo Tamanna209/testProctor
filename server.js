@@ -10,15 +10,31 @@ import questionRoutes from "./routes/question.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import devRoutes from "./routes/dev.routes.js";
 console.log(process.env.MONGODB_URL);
-const FRONTEND_URL = "https://proctortamdev.netlify.app/";
+const rawFrontend = "https://proctortamdev.netlify.app/";
+const FRONTEND_URL = rawFrontend.replace(/\/+$/, "");
+console.log("Configured FRONTEND_URL:", FRONTEND_URL);
+const allowedOrigins = [
+  FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
+].filter(Boolean);
 
 const app = express();
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: function (origin, callback) {
+      // allow non-browser (curl, server-to-server) requests with no origin
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS policy: origin not allowed"));
+    },
     credentials: true,
   })
 );
+// Also ensure preflight requests are handled
+app.options("*", cors());
 app.use(express.json());
 
 // app.use(cors(corsOptions));
