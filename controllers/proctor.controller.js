@@ -18,7 +18,8 @@ const proctorEvent = async (req, res) => {
     if (
       eventType === "TAB_SWITCH" ||
       eventType === "REFRESH" ||
-      eventType === "CAMERA_MIC_OFF"
+      eventType === "CAMERA_MIC_OFF" ||
+      eventType === "FULLSCREEN_EXIT"
     ) {
       // If there's an active test session for this user, treat this as
       // cheating and block the account immediately.
