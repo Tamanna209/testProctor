@@ -11,6 +11,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import devRoutes from "./routes/dev.routes.js";
 console.log(process.env.MONGODB_URL);
 const rawFrontend = process.env.FRONTEND_URL || "";
+// const rawFrontend="http://localhost:5173";
 const FRONTEND_URL = rawFrontend.replace(/\/+$/, "");
 console.log("Configured FRONTEND_URL:", FRONTEND_URL);
 const allowedOrigins = [

@@ -11,32 +11,45 @@ const proctorEvent = async (req, res) => {
 
     await ProctorLog.create({ userId, eventType, details });
 
-    // Only block for suspicious activity if test is still active (not yet submitted)
+    // Only block for certain suspicious events. Use active session presence
+    // instead of relying solely on Test. This prevents a race where the
+    // client submits the test (setting endedAt) before the proctor event
+    // reaches the server.
     if (
       eventType === "TAB_SWITCH" ||
       eventType === "REFRESH" ||
       eventType === "CAMERA_MIC_OFF"
     ) {
-      // Find the most recent active test (no endedAt)
-      const activeTest = await Test.findOne({
+      // If there's an active test session for this user, treat this as
+      // cheating and block the account immediately.
+      const activeSession = await TestSession.findOne({
         userId,
-        endedAt: { $exists: false },
+        isActive: true,
       });
 
-      // Only block if there's an active test (not submitted yet)
-      if (activeTest) {
+      if (activeSession) {
         await User.findByIdAndUpdate(userId, {
           isBlocked: true,
           blockedReason: `Cheating detected: ${eventType}.`,
         });
 
+        // Deactivate any live sessions so further requests are rejected
         await TestSession.updateMany({ userId }, { isActive: false });
+
+        // Mark any still-open tests as cheating (best-effort)
+        await Test.updateMany(
+          { userId, endedAt: { $exists: false } },
+          {
+            isCheating: true,
+            cheatingReason: `Cheating detected: ${eventType}.`,
+          }
+        );
 
         return res.status(403).json({
           message: "Cheating detected. You are permanently blocked.",
         });
       }
-      // If test is already submitted (endedAt exists), ignore the event
+      // If no active session found, ignore the event
     }
 
     res.json({ message: "Event logged" });

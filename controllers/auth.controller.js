@@ -13,6 +13,13 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, phone, college, technology } = req.body;
 
+    // Basic required-field validation to avoid Mongoose validation errors
+    if (!name || !email || !phone || !college) {
+      return res
+        .status(400)
+        .json({ message: "name, email, phone and college are required" });
+    }
+
     // Basic backend validation (allow a whitelist of domains)
     const emailLower = (email || "").toLowerCase().trim();
     const domain = (emailLower.split("@")[1] || "").toLowerCase();
@@ -23,11 +30,9 @@ const registerUser = async (req, res) => {
       "yahoo.com",
     ];
     if (!domain || !allowedDomains.includes(domain)) {
-      return res
-        .status(400)
-        .json({
-          message: `Email domain must be one of: ${allowedDomains.join(", ")}`,
-        });
+      return res.status(400).json({
+        message: `Email domain must be one of: ${allowedDomains.join(", ")}`,
+      });
     }
 
     const phoneClean = (phone || "").toString().replace(/\D/g, "");
@@ -97,14 +102,22 @@ const registerUser = async (req, res) => {
     // Dev-log: print OTP to console (developer convenience only)
     console.log(`[DEV] OTP for ${emailLower}: ${otp} (expires in 5 minutes)`);
 
-    await sendMail(
-      emailLower,
-      "Your OTP for Coding Test",
-      `<h2>Your OTP is: <b>${otp}</b></h2><p>This OTP will expire in 5 minutes.</p>`
-    );
+    try {
+      await sendMail(
+        emailLower,
+        "Your OTP for Coding Test",
+        `<h2>Your OTP is: <b>${otp}</b></h2><p>This OTP will expire in 5 minutes.</p>`
+      );
+    } catch (mailErr) {
+      console.warn(
+        `[DEV] sendMail failed for ${emailLower}:`,
+        mailErr?.message || mailErr
+      );
+      // Don't fail the whole registration flow if email sending fails in dev/local.
+    }
 
     res.json({
-      message: "OTP sent to email.",
+      message: "OTP sent to email (or queued).",
       email: emailLower,
     });
   } catch (error) {
